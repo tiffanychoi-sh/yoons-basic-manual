@@ -221,7 +221,7 @@ footer{max-width:880px; margin:0 auto; padding:0 20px 36px; font-size:11.5px; co
 <!-- ===================== 문자 생성기 ===================== -->
 <section id="tab-msg" hidden>
   <h2>가입 안내 문자 만들기</h2>
-  <p class="desc">6개 항목을 채우면 규정에 맞는 안내 문자 2가지가 완성됩니다. 복사해서 학부모 카톡으로 보내고, <b>확인 답변</b>을 꼭 받으세요.</p>
+  <p class="desc">6개 항목을 채우면 규정에 맞는 안내 문자 3가지가 완성됩니다. 복사해서 학부모 카톡으로 보내고, <b>확인 답변</b>을 꼭 받으세요.</p>
   <div class="card">
     <div class="grid2">
       <div><label for="fTeacher">담당 교사 이름</label><input type="text" id="fTeacher" placeholder="예: 최성희"></div>
@@ -251,13 +251,15 @@ footer{max-width:880px; margin:0 auto; padding:0 20px 36px; font-size:11.5px; co
       <div><label for="fArrive">교재 도착 예정일</label><input type="text" id="fArrive" placeholder="예: 5월 18일(월)"></div>
       <div><label for="fZoom">줌 수업 링크</label><input type="text" id="fZoom" placeholder="https://zoom.us/j/..."></div>
     </div>
-    <div style="margin-top:14px"><button class="btn" onclick="buildMsgs()">문자 2가지 생성하기</button></div>
+    <div style="margin-top:14px"><button class="btn" onclick="buildMsgs()">문자 3가지 생성하기</button></div>
   </div>
   <div id="msgOut" hidden>
     <div class="msg-head"><h3>문자 ① 기본 안내</h3><button class="btn sm" onclick="copyText(document.getElementById('msg1').innerText,this)">복사</button></div>
     <pre class="msg" id="msg1"></pre>
     <div class="msg-head"><h3>문자 ② 수업 규정 + 확인 답변</h3><button class="btn sm" onclick="copyText(document.getElementById('msg2').innerText,this)">복사</button></div>
     <pre class="msg" id="msg2"></pre>
+    <div class="msg-head"><h3>문자 ③ 학부모님 대화창 공지사항용</h3><button class="btn sm" onclick="copyText(document.getElementById('msg3').innerText,this)">복사</button></div>
+    <pre class="msg" id="msg3"></pre>
   </div>
 </section>
 
@@ -604,6 +606,12 @@ return `⚠️ 꼭 확인해 주세요! (수업 규정)
 궁금한 점이 있으시면 언제든지 편하게 연락 주세요.
 ${withI(d.child)}의 영어 습관 정착을 위해 최선을 다하겠습니다! 🌟`;
 }
+function tmplMsg3(d){
+return `📢 정규 수업 공지
+
+🗓️ 수업 시간: ${d.day}
+🔗 줌 링크: ${d.zoom}`;
+}
 
 /* ============================================================
    이하 로직 — 큰 틀. (되도록 수정하지 않기)
@@ -753,6 +761,7 @@ function buildMsgs(){
              day:v("fDay"), pay:v("fPay"), arrive:v("fArrive"), zoom:v("fZoom")};
   document.getElementById("msg1").textContent = tmplMsg1(d);
   document.getElementById("msg2").textContent = tmplMsg2(d);
+  document.getElementById("msg3").textContent = tmplMsg3(d);
   document.getElementById("msgOut").hidden = false;
   document.getElementById("msgOut").scrollIntoView({behavior:"smooth"});
 }
