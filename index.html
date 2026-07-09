@@ -165,6 +165,7 @@ footer{max-width:880px; margin:0 auto; padding:0 20px 36px; font-size:11.5px; co
       <button role="tab" data-tab="faq" aria-selected="false">FAQ 찾아보기</button>
       <button role="tab" data-tab="check" aria-selected="false">신규회원 체크리스트</button>
       <button role="tab" data-tab="msg" aria-selected="false">안내문자 만들기</button>
+      <button role="tab" data-tab="feedback" aria-selected="false">주간 피드백</button>
       <button role="tab" data-tab="lib" aria-selected="false">자료실</button>
     </nav>
   </div>
@@ -281,6 +282,60 @@ footer{max-width:880px; margin:0 auto; padding:0 20px 36px; font-size:11.5px; co
     <pre class="msg" id="msg2"></pre>
     <div class="msg-head"><h3>문자 ③ 학부모님 대화창 공지사항용</h3><button class="btn sm" onclick="copyText(document.getElementById('msg3').innerText,this)">복사</button></div>
     <pre class="msg" id="msg3"></pre>
+  </div>
+</section>
+
+<!-- ===================== 주간 피드백 ===================== -->
+<section id="tab-feedback" hidden>
+  <h2>주간 피드백 문자 만들기</h2>
+  <p class="desc">항목을 채우면 학부모님께 보낼 주간 학습 리포트 문자가 완성됩니다. 매주 1회(가입 3개월까지) 또는 월 1회 이상 보내주세요.</p>
+  <div class="card">
+    <div class="grid2">
+      <div><label for="fbChild">아이 이름</label><input type="text" id="fbChild" placeholder="은우 (성은 빼고 입력해주세요)"></div>
+      <div><label for="fbBefly">스마트베플리 학습 (주 5일 기준)</label>
+        <select id="fbBefly">
+          <option value="5">5/5일 완료</option>
+          <option value="4">4/5일 완료</option>
+          <option value="3">3/5일 완료</option>
+          <option value="2">2/5일 완료</option>
+          <option value="1">1/5일 완료</option>
+          <option value="0">0/5일 완료</option>
+        </select>
+      </div>
+      <div><label for="fbEval">평가앱 완료 (주 5일 기준)</label>
+        <select id="fbEval">
+          <option value="5">5/5일 완료</option>
+          <option value="4">4/5일 완료</option>
+          <option value="3">3/5일 완료</option>
+          <option value="2">2/5일 완료</option>
+          <option value="1">1/5일 완료</option>
+          <option value="0">0/5일 완료</option>
+        </select>
+      </div>
+      <div><label for="fbAttitude">수업 태도</label>
+        <select id="fbAttitude">
+          <option value="매우 좋음">매우 좋음</option>
+          <option value="좋음">좋음</option>
+          <option value="보통">보통</option>
+          <option value="개선 필요">개선 필요</option>
+        </select>
+      </div>
+      <div><label for="fbLevel">학습 난이도 체감</label>
+        <select id="fbLevel">
+          <option value="쉬움">쉬움</option>
+          <option value="적당함">적당함</option>
+          <option value="약간 어려움">약간 어려움</option>
+          <option value="어려움">어려움</option>
+        </select>
+      </div>
+    </div>
+    <label for="fbComment">선생님 코멘트</label>
+    <textarea id="fbComment" rows="4" placeholder="예: 이번 주는 베플리 5일을 빠짐없이 완료해서 정말 잘했다고 칭찬해줬어요! 평가앱이 하루 빠진 부분은 수업 중에 함께 짚어보고 보충하도록 안내드렸습니다. 수업에서는 장모음 A와 I를 배웠는데, 지난주까지 헷갈려하던 발음을 이번 주엔 스스로 척척 맞혀서 정말 뿌듯했어요. 이 흐름 잘 이어갈 수 있도록 계속 신경 써서 지도하겠습니다."></textarea>
+    <div style="margin-top:14px"><button class="btn" onclick="buildFeedback()">피드백 문자 생성하기</button></div>
+  </div>
+  <div id="fbOut" hidden>
+    <div class="msg-head"><h3>주간 피드백 문자</h3><button class="btn sm" onclick="copyText(document.getElementById('fbMsg').innerText,this)">복사</button></div>
+    <pre class="msg" id="fbMsg"></pre>
   </div>
 </section>
 
@@ -674,7 +729,7 @@ if(store.get("authed", false)){
 }
 
 /* ---------- 탭 ---------- */
-const tabIds = ["home","faq","check","msg","lib"];
+const tabIds = ["home","faq","check","msg","feedback","lib"];
 function goTab(id){
   tabIds.forEach(t=>{
     document.getElementById("tab-"+t).hidden = (t!==id);
@@ -779,6 +834,40 @@ function buildMsgs(){
   document.getElementById("msg3").textContent = tmplMsg3(d);
   document.getElementById("msgOut").hidden = false;
   document.getElementById("msgOut").scrollIntoView({behavior:"smooth"});
+}
+
+/* ---------- 주간 피드백 문자 생성 ---------- */
+function tmplFeedback(f){
+const nameI = withI(f.child);
+const nameGa = nameI; // 은우+가, 하늘이+가
+return `안녕하세요, 어머님! 😊
+이번 주 ${nameI} 학습 현황 안내드립니다.
+
+📊 이번 주 학습 리포트
+📱 스마트베플리 학습: ${f.befly}/5일 완료
+✅ 평가앱 완료: ${f.evalApp}/5일 완료
+🙋 수업 태도: ${f.attitude}
+📈 학습 난이도 체감: ${f.level}
+
+📝 선생님 코멘트
+${f.comment}
+
+${nameGa}가 한 주 동안 열심히 잘 따라와줬어요! 다음 주도 함께 응원해주세요 💪
+궁금하신 점 있으시면 언제든 편하게 연락 주세요 😊`;
+}
+function buildFeedback(){
+  const v = id => document.getElementById(id).value.trim() || "____";
+  const f = {
+    child: v("fbChild"),
+    befly: v("fbBefly"),
+    evalApp: v("fbEval"),
+    attitude: v("fbAttitude"),
+    level: v("fbLevel"),
+    comment: v("fbComment")
+  };
+  document.getElementById("fbMsg").textContent = tmplFeedback(f);
+  document.getElementById("fbOut").hidden = false;
+  document.getElementById("fbOut").scrollIntoView({behavior:"smooth"});
 }
 
 /* ---------- 자료실 렌더 ---------- */
