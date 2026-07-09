@@ -45,6 +45,8 @@ h2:first-child{margin-top:4px;}
 .grid2{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
 @media(max-width:640px){.grid2{grid-template-columns:1fr;}}
 .prodfield{grid-column:1 / -1;}
+.msgCatOpts{display:flex; gap:8px; flex-wrap:wrap; margin:10px 0 18px;}
+.msgCatOpts .prodBtn{flex:1 1 140px; text-align:center;}
 .prodOpts{display:flex; flex-direction:column; gap:8px; margin-top:2px;}
 .prodBtn{text-align:left; border:1.5px solid var(--line); background:#fff; border-radius:10px; padding:10px 12px; cursor:pointer; font-family:var(--body); width:100%;}
 .prodBtn b{display:block; font-size:14px; color:var(--ink);}
@@ -164,8 +166,7 @@ footer{max-width:880px; margin:0 auto; padding:0 20px 36px; font-size:11.5px; co
       <button role="tab" data-tab="home" aria-selected="true">홈</button>
       <button role="tab" data-tab="faq" aria-selected="false">FAQ 찾아보기</button>
       <button role="tab" data-tab="check" aria-selected="false">신규회원 체크리스트</button>
-      <button role="tab" data-tab="msg" aria-selected="false">안내문자 만들기</button>
-      <button role="tab" data-tab="feedback" aria-selected="false">주간 피드백</button>
+      <button role="tab" data-tab="msg" aria-selected="false">안내메시지 만들기</button>
       <button role="tab" data-tab="lib" aria-selected="false">자료실</button>
     </nav>
   </div>
@@ -186,7 +187,7 @@ footer{max-width:880px; margin:0 auto; padding:0 20px 36px; font-size:11.5px; co
   <h2>지금 할 일이…</h2>
   <div class="quick">
     <button class="btn" onclick="goTab('check')">신규 회원이 들어왔어요 → 체크리스트</button>
-    <button class="btn ghost" onclick="goTab('msg')">가입 안내 문자 보내야 해요 → 문자 만들기</button>
+    <button class="btn ghost" onclick="goTab('msg')">안내 메시지 보내야 해요 → 메시지 만들기</button>
     <button class="btn ghost" onclick="goTab('faq')">뭔가 막혔어요 → FAQ 검색</button>
   </div>
 </section>
@@ -242,9 +243,33 @@ footer{max-width:880px; margin:0 auto; padding:0 20px 36px; font-size:11.5px; co
 
 <!-- ===================== 문자 생성기 ===================== -->
 <section id="tab-msg" hidden>
-  <h2>가입 안내 문자 만들기</h2>
-  <p class="desc">6개 항목을 채우면 규정에 맞는 안내 문자 3가지가 완성됩니다. 복사해서 학부모 카톡으로 보내고, <b>확인 답변</b>을 꼭 받으세요.</p>
-  <div class="card">
+  <h2>안내메시지 만들기</h2>
+  <p class="desc">보낼 메시지 종류를 선택하세요.</p>
+  <div class="msgCatOpts" id="msgCatOpts">
+    <button type="button" class="prodBtn active" data-cat="trial"><b>체험수업 안내</b></button>
+    <button type="button" class="prodBtn" data-cat="new"><b>신규회원 안내</b></button>
+    <button type="button" class="prodBtn" data-cat="feedback"><b>주간 피드백</b></button>
+  </div>
+
+  <!-- 체험수업 안내 -->
+  <div class="card msgForm" id="form-trial">
+    <p class="desc" style="margin-bottom:10px">4개 항목을 채우면 체험수업 안내 문자가 완성됩니다.</p>
+    <div class="grid2">
+      <div><label for="ftTeacher">담당 교사 이름</label><input type="text" id="ftTeacher" placeholder="예: 최성희"></div>
+      <div><label for="ftChild">아이 이름</label><input type="text" id="ftChild" placeholder="은우 (성은 빼고 입력해주세요)"></div>
+      <div><label for="ftDate">체험수업 일시</label><input type="text" id="ftDate" placeholder="예: 5월 20일(화) 오후 5시"></div>
+      <div><label for="ftZoom">줌 링크</label><input type="text" id="ftZoom" placeholder="https://zoom.us/j/..."></div>
+    </div>
+    <div style="margin-top:14px"><button class="btn" onclick="buildTrial()">체험수업 안내 문자 생성하기</button></div>
+  </div>
+  <div id="trialOut" hidden>
+    <div class="msg-head"><h3>체험수업 안내 문자</h3><button class="btn sm" onclick="copyText(document.getElementById('trialMsg').innerText,this)">복사</button></div>
+    <pre class="msg" id="trialMsg"></pre>
+  </div>
+
+  <!-- 신규회원 안내 -->
+  <div class="card msgForm" id="form-new" hidden>
+    <p class="desc" style="margin-bottom:10px">6개 항목을 채우면 규정에 맞는 안내 문자 3가지가 완성됩니다. 복사해서 학부모 카톡으로 보내고, <b>확인 답변</b>을 꼭 받으세요.</p>
     <div class="grid2">
       <div><label for="fTeacher">담당 교사 이름</label><input type="text" id="fTeacher" placeholder="예: 최성희"></div>
       <div><label for="fChild">아이 이름</label><input type="text" id="fChild" placeholder="은우 (성은 빼고 입력해주세요)"></div>
@@ -283,33 +308,24 @@ footer{max-width:880px; margin:0 auto; padding:0 20px 36px; font-size:11.5px; co
     <div class="msg-head"><h3>문자 ③ 학부모님 대화창 공지사항용</h3><button class="btn sm" onclick="copyText(document.getElementById('msg3').innerText,this)">복사</button></div>
     <pre class="msg" id="msg3"></pre>
   </div>
-</section>
 
-<!-- ===================== 주간 피드백 ===================== -->
-<section id="tab-feedback" hidden>
-  <h2>주간 피드백 문자 만들기</h2>
-  <p class="desc">항목을 채우면 학부모님께 보낼 주간 학습 리포트 문자가 완성됩니다. 매주 1회(가입 3개월까지) 또는 월 1회 이상 보내주세요.</p>
-  <div class="card">
+  <!-- 주간 피드백 -->
+  <div class="card msgForm" id="form-feedback" hidden>
+    <p class="desc" style="margin-bottom:10px">항목을 채우면 학부모님께 보낼 주간 학습 리포트 문자가 완성됩니다. 매주 1회(가입 3개월까지) 또는 월 1회 이상 보내주세요.</p>
     <div class="grid2">
       <div><label for="fbChild">아이 이름</label><input type="text" id="fbChild" placeholder="은우 (성은 빼고 입력해주세요)"></div>
-      <div><label for="fbBefly">스마트베플리 학습 (주 5일 기준)</label>
+      <div><label for="fbBefly">스마트베플리 학습</label>
         <select id="fbBefly">
-          <option value="5">5/5일 완료</option>
-          <option value="4">4/5일 완료</option>
-          <option value="3">3/5일 완료</option>
-          <option value="2">2/5일 완료</option>
-          <option value="1">1/5일 완료</option>
-          <option value="0">0/5일 완료</option>
+          <option value="꾸준히 잘 했어요">꾸준히 잘 했어요</option>
+          <option value="가끔 밀렸어요">가끔 밀렸어요</option>
+          <option value="자주 밀렸어요">자주 밀렸어요</option>
         </select>
       </div>
-      <div><label for="fbEval">평가앱 완료 (주 5일 기준)</label>
+      <div><label for="fbEval">평가앱 완료</label>
         <select id="fbEval">
-          <option value="5">5/5일 완료</option>
-          <option value="4">4/5일 완료</option>
-          <option value="3">3/5일 완료</option>
-          <option value="2">2/5일 완료</option>
-          <option value="1">1/5일 완료</option>
-          <option value="0">0/5일 완료</option>
+          <option value="꾸준히 잘 했어요">꾸준히 잘 했어요</option>
+          <option value="가끔 밀렸어요">가끔 밀렸어요</option>
+          <option value="자주 밀렸어요">자주 밀렸어요</option>
         </select>
       </div>
       <div><label for="fbAttitude">수업 태도</label>
@@ -729,7 +745,7 @@ if(store.get("authed", false)){
 }
 
 /* ---------- 탭 ---------- */
-const tabIds = ["home","faq","check","msg","feedback","lib"];
+const tabIds = ["home","faq","check","msg","lib"];
 function goTab(id){
   tabIds.forEach(t=>{
     document.getElementById("tab-"+t).hidden = (t!==id);
@@ -816,6 +832,44 @@ function renderMembers(){
 }
 renderMembers();
 
+/* ---------- 안내메시지 카테고리 전환 ---------- */
+const msgCatOptsEl = document.getElementById("msgCatOpts");
+msgCatOptsEl.addEventListener("click", e=>{
+  const b = e.target.closest(".prodBtn"); if(!b) return;
+  msgCatOptsEl.querySelectorAll(".prodBtn").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");
+  const cat = b.dataset.cat;
+  ["trial","new","feedback"].forEach(c=>{
+    document.getElementById("form-"+c).hidden = (c!==cat);
+  });
+  document.getElementById("trialOut").hidden = true;
+  document.getElementById("msgOut").hidden = true;
+  document.getElementById("fbOut").hidden = true;
+});
+
+/* ---------- 체험수업 안내 문자 생성 ---------- */
+function tmplTrial(t){
+return `안녕하세요, 어머님! 😊
+윤선생 베이직 교사 ${t.teacher}입니다.
+${withI(t.child)}와의 체험수업 안내드립니다.
+
+📅 체험수업 일시: ${t.date}
+🔗 줌 링크: ${t.zoom}
+
+체험수업 5분 전, 조용하고 편안한 공간에서 참여할 수 있도록 준비해주세요.
+
+체험수업은 약 15분 정도 진행되며, ${withI(t.child)} 학습 단계를 확인하고 윤선생 학습을 직접 체험해보는 시간이에요.
+궁금하신 점 있으시면 언제든 편하게 연락 주세요 😊
+그럼 체험수업 때 뵙겠습니다!`;
+}
+function buildTrial(){
+  const v = id => document.getElementById(id).value.trim() || "____";
+  const t = {teacher:v("ftTeacher"), child:v("ftChild"), date:v("ftDate"), zoom:v("ftZoom")};
+  document.getElementById("trialMsg").textContent = tmplTrial(t);
+  document.getElementById("trialOut").hidden = false;
+  document.getElementById("trialOut").scrollIntoView({behavior:"smooth"});
+}
+
 /* ---------- 문자 생성 ---------- */
 const prodOptsEl = document.getElementById("prodOpts");
 prodOptsEl.querySelectorAll(".prodBtn")[0].classList.add("active");
@@ -844,8 +898,8 @@ return `안녕하세요, 어머님! 😊
 이번 주 ${nameI} 학습 현황 안내드립니다.
 
 📊 이번 주 학습 리포트
-📱 스마트베플리 학습: ${f.befly}/5일 완료
-✅ 평가앱 완료: ${f.evalApp}/5일 완료
+📱 스마트베플리 학습: ${f.befly}
+✅ 평가앱 완료: ${f.evalApp}
 🙋 수업 태도: ${f.attitude}
 📈 학습 난이도 체감: ${f.level}
 
