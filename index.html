@@ -174,6 +174,10 @@ footer{max-width:880px; margin:0 auto; padding:0 20px 36px; font-size:11.5px; co
 
 <!-- ===================== 홈 ===================== -->
 <section id="tab-home">
+  <div class="card" style="background:var(--red); color:#fff; border:none">
+    <p style="font-weight:800; font-size:13.5px; margin:0; line-height:1.6">🔄 이 페이지는 수시로 업데이트됩니다. 예전에 즐겨찾기 해두셨다면 들어올 때마다 새로고침(F5)해서 최신 버전으로 봐주세요.</p>
+  </div>
+
   <h2>필수 사이트 바로가기</h2>
   <p class="desc">매일 접속하는 4개 사이트입니다. 로그인은 모두 베이직 전용 아이디를 사용하세요.<br>카드를 클릭하면 해당 사이트로 바로 연결됩니다.</p>
   <div class="sitegrid" id="siteGrid"></div>
@@ -194,6 +198,7 @@ footer{max-width:880px; margin:0 auto; padding:0 20px 36px; font-size:11.5px; co
     <span class="ico" aria-hidden="true">⌕</span>
     <input type="text" id="faqSearch" placeholder="궁금한 키워드를 입력하세요" aria-label="FAQ 검색">
   </div>
+  <p style="font-size:12px; color:var(--red); font-weight:700; margin:-6px 0 12px">⚠️ 키워드 검색은 반드시 '전체'를 선택한 상태에서 해주세요. 카테고리가 선택되어 있으면 그 안에서만 검색됩니다.</p>
   <div class="chips" id="faqChips"></div>
   <div class="count" id="faqCount"></div>
   <div id="faqList"></div>
@@ -723,23 +728,25 @@ function sendSuggestion(){
 }
 
 /* ---------- 체크리스트 ---------- */
-let members = store.get("members", []);   // [{name, checks:[bool x7], date}]
+let members = store.get("members", []);   // [{name, checks:[bool x7], date, notes}]
 function saveMembers(){ store.set("members", members); renderMembers(); }
 function addMember(){
   const inp = document.getElementById("newMember");
   const name = inp.value.trim();
   if(!name) { inp.focus(); return; }
-  members.unshift({name, checks: CHECK_STEPS.map(()=>false), date: new Date().toLocaleDateString("ko-KR")});
+  members.unshift({name, checks: CHECK_STEPS.map(()=>false), date: new Date().toLocaleDateString("ko-KR"), notes: ""});
   inp.value = ""; saveMembers();
 }
 function toggleStep(mi, si){ members[mi].checks[si] = !members[mi].checks[si]; saveMembers(); }
+function updateNotes(mi, val){ members[mi].notes = val; store.set("members", members); }
 function delMember(mi){ if(confirm(`'${members[mi].name}' 회원의 체크리스트를 삭제할까요?`)){ members.splice(mi,1); saveMembers(); } }
 function reportMember(mi, btn){
   const m = members[mi];
   const done = m.checks.filter(Boolean).length;
   const undone = CHECK_STEPS.filter((s,i)=>!m.checks[i]).map(s=>s.t);
-  const txt = `[신규회원 체크] ${m.name} 회원 (${m.date} 등록)\n진행: ${done}/${CHECK_STEPS.length} 완료` +
+  let txt = `[신규회원 체크] ${m.name} 회원 (${m.date} 등록)\n${CHECK_STEPS.length}개 항목 중 ${done}개 완료` +
     (undone.length? `\n미완료: ${undone.join(", ")}` : `\n✅ 모든 단계 완료!`);
+  if(m.notes && m.notes.trim()){ txt += `\n\n📝 특이사항: ${m.notes.trim()}`; }
   copyText(txt, btn);
 }
 function renderMembers(){
@@ -753,6 +760,8 @@ function renderMembers(){
       ${CHECK_STEPS.map((s,si)=>`
         <label class="step"><input type="checkbox" ${m.checks[si]?"checked":""} onchange="toggleStep(${mi},${si})">
           <span class="t"><b>${si+1}. ${s.t}</b><small>${s.d}</small></span></label>`).join("")}
+      <label style="font-size:12.5px; font-weight:700; color:var(--sub); display:block; margin:12px 0 4px">특이사항</label>
+      <textarea rows="2" placeholder="학부모와 통화 시 특이사항이 있다면 여기에 적어주세요." oninput="updateNotes(${mi}, this.value)">${m.notes || ""}</textarea>
       <div class="member-actions">
         <button class="btn sm" onclick="reportMember(${mi}, this)">진행상황 복사</button>
         <button class="btn sm ghost" onclick="delMember(${mi})">삭제</button>
