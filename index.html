@@ -97,6 +97,8 @@ details.faq .a b{color:var(--red);}
 
 /* ---------- 체크리스트 ---------- */
 .member{border:1px solid var(--line); background:var(--card); border-radius:14px; padding:16px 18px; margin-bottom:14px;}
+.subhead{font-family:var(--disp); font-size:14.5px; font-weight:800; color:var(--red); margin:16px 0 8px;}
+.subhead:first-of-type{margin-top:6px;}
 .member-head{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px;}
 .member-head b{font-size:16px; font-family:var(--disp);}
 .bar{flex:1 1 120px; height:8px; background:var(--tint); border-radius:99px; overflow:hidden; min-width:90px;}
@@ -165,6 +167,7 @@ footer{max-width:880px; margin:0 auto; padding:0 20px 36px; font-size:11.5px; co
     <nav role="tablist" id="tabs">
       <button role="tab" data-tab="home" aria-selected="true">홈</button>
       <button role="tab" data-tab="faq" aria-selected="false">FAQ 찾아보기</button>
+      <button role="tab" data-tab="trial" aria-selected="false">체험수업 체크리스트</button>
       <button role="tab" data-tab="check" aria-selected="false">신규회원 체크리스트</button>
       <button role="tab" data-tab="msg" aria-selected="false">안내메시지 만들기</button>
       <button role="tab" data-tab="lib" aria-selected="false">자료실</button>
@@ -212,6 +215,17 @@ footer{max-width:880px; margin:0 auto; padding:0 20px 36px; font-size:11.5px; co
   </div>
 </section>
 
+<!-- ===================== 체험수업 체크리스트 ===================== -->
+<section id="tab-trial" hidden>
+  <h2>체험수업 체크리스트</h2>
+  <p class="desc">체험 전 / 체험 후로 나눠 기록하고, 상담팀장님께 바로 공유할 메시지를 만드세요.</p>
+  <div class="addrow">
+    <input type="text" id="newTrial" placeholder="회원 이름 입력 (예: 차은우)" aria-label="회원 이름">
+    <button class="btn" onclick="addTrial()">회원 추가</button>
+  </div>
+  <div id="trialList"></div>
+</section>
+
 <!-- ===================== 체크리스트 ===================== -->
 <section id="tab-check" hidden>
   <h2>📅 매주·매월 정기 체크리스트</h2>
@@ -255,7 +269,7 @@ footer{max-width:880px; margin:0 auto; padding:0 20px 36px; font-size:11.5px; co
   <div class="card msgForm" id="form-trial">
     <p class="desc" style="margin-bottom:10px">4개 항목을 채우면 체험수업 안내 문자가 완성됩니다.</p>
     <div class="grid2">
-      <div><label for="ftTeacher">담당 교사 이름</label><input type="text" id="ftTeacher" placeholder="예: 최성희"></div>
+      <div><label for="ftTeacher">담당 교사 이름</label><input type="text" id="ftTeacher" placeholder="예: 김샤넬"></div>
       <div><label for="ftChild">아이 이름</label><input type="text" id="ftChild" placeholder="은우 (성은 빼고 입력해주세요)"></div>
       <div><label for="ftDate">체험수업 일시</label><input type="text" id="ftDate" placeholder="예: 5월 20일(화) 오후 5시"></div>
       <div><label for="ftZoom">줌 링크</label><input type="text" id="ftZoom" placeholder="https://zoom.us/j/..."></div>
@@ -271,7 +285,7 @@ footer{max-width:880px; margin:0 auto; padding:0 20px 36px; font-size:11.5px; co
   <div class="card msgForm" id="form-new" hidden>
     <p class="desc" style="margin-bottom:10px">6개 항목을 채우면 규정에 맞는 안내 문자 3가지가 완성됩니다. 복사해서 학부모 카톡으로 보내고, <b>확인 답변</b>을 꼭 받으세요.</p>
     <div class="grid2">
-      <div><label for="fTeacher">담당 교사 이름</label><input type="text" id="fTeacher" placeholder="예: 최성희"></div>
+      <div><label for="fTeacher">담당 교사 이름</label><input type="text" id="fTeacher" placeholder="예: 김샤넬"></div>
       <div><label for="fChild">아이 이름</label><input type="text" id="fChild" placeholder="은우 (성은 빼고 입력해주세요)"></div>
       <div class="prodfield"><label>가입 상품</label>
         <div class="prodOpts" id="prodOpts">
@@ -745,7 +759,7 @@ if(store.get("authed", false)){
 }
 
 /* ---------- 탭 ---------- */
-const tabIds = ["home","faq","check","msg","lib"];
+const tabIds = ["home","faq","trial","check","msg","lib"];
 function goTab(id){
   tabIds.forEach(t=>{
     document.getElementById("tab-"+t).hidden = (t!==id);
@@ -832,6 +846,109 @@ function renderMembers(){
 }
 renderMembers();
 
+/* ---------- 체험수업 체크리스트 ---------- */
+let trials = store.get("trials", []);
+// [{name, date, before:{katalkSent,schedule,level,notes}, after:{done,doneAt,feedbackDone,finalLevel,wantTime,notes}}]
+function saveTrials(){ store.set("trials", trials); renderTrials(); }
+function newTrial(name){
+  return { name, date: new Date().toLocaleDateString("ko-KR"),
+    before: { callDone:false, katalkSent:false, schedule:"", level:"", notes:"" },
+    after: { done:false, doneAt:"", feedbackDone:false, finalLevel:"", wantTime:"", notes:"" } };
+}
+function addTrial(){
+  const inp = document.getElementById("newTrial");
+  const name = inp.value.trim();
+  if(!name){ inp.focus(); return; }
+  trials.unshift(newTrial(name));
+  inp.value = ""; saveTrials();
+}
+function delTrial(i){
+  if(confirm(`'${trials[i].name}' 회원의 체험수업 기록을 삭제할까요?`)){ trials.splice(i,1); saveTrials(); }
+}
+function nowStamp(){
+  const d = new Date();
+  const pad = n => String(n).padStart(2,"0");
+  return `${d.getMonth()+1}월 ${d.getDate()}일 ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+function setTrialBefore(i, field, val){
+  trials[i].before[field] = val; store.set("trials", trials);
+}
+function setTrialAfter(i, field, val){
+  const a = trials[i].after;
+  a[field] = val;
+  if(field === "done"){ a.doneAt = val ? nowStamp() : ""; }
+  store.set("trials", trials);
+  if(field === "done") renderTrials();
+}
+function tmplTrialBefore(t){
+  const b = t.before;
+  return `[체험수업 전 안내] ${t.name} 회원
+상담팀장님께서 주신 정보로 학부모님과 상담전화 진행했습니다.
+
+${b.callDone ? "☑" : "☐"} 학부모님과 상담 전화 완료
+${b.katalkSent ? "☑" : "☐"} 카톡 안내 메시지 전달 완료
+📅 체험수업 일정: ${b.schedule || "____"}
+📊 체험 수업 레벨: ${b.level || "____"}
+
+📝 특이사항: ${b.notes.trim() || "없음"}`;
+}
+function tmplTrialAfter(t){
+  const a = t.after;
+  return `[체험수업 후 안내] ${t.name} 회원
+${a.doneAt ? a.doneAt + " 체험수업 완료했습니다." : "체험수업 완료했습니다."}
+
+${a.feedbackDone ? "☑" : "☐"} 학부모 피드백 통화 완료
+📊 적정 단계: ${a.finalLevel || "____"}
+🕐 가입 상담 희망 시간: ${a.wantTime || "____"}
+
+가입 관련 상담은 상담팀장님께서 연락드릴 예정이라고 안내드렸습니다.
+📝 특이사항: ${a.notes.trim() || "없음"}`;
+}
+function copyTrialBefore(i, btn){ copyText(tmplTrialBefore(trials[i]), btn); }
+function copyTrialAfter(i, btn){ copyText(tmplTrialAfter(trials[i]), btn); }
+function renderTrials(){
+  const el = document.getElementById("trialList");
+  if(!trials.length){ el.innerHTML = `<div class="card" style="text-align:center;color:var(--sub);font-size:13.5px">아직 등록된 체험수업 회원이 없어요. 위에서 회원 이름을 추가해 시작하세요.</div>`; return; }
+  el.innerHTML = trials.map((t,i)=>{
+    const b = t.before, a = t.after;
+    return `<div class="member">
+      <div class="member-head"><b>${t.name} 회원</b><span style="font-size:11.5px;color:var(--sub)">${t.date}</span></div>
+
+      <div class="subhead">① 체험 수업 전</div>
+      <label class="step"><input type="checkbox" ${b.callDone?"checked":""} onchange="setTrialBefore(${i},'callDone',this.checked)">
+        <span class="t"><b>학부모님과 상담 전화 완료</b></span></label>
+      <label class="step"><input type="checkbox" ${b.katalkSent?"checked":""} onchange="setTrialBefore(${i},'katalkSent',this.checked)">
+        <span class="t"><b>카톡 안내 메시지 전달 완료</b></span></label>
+      <label style="font-size:12.5px; font-weight:700; color:var(--sub); display:block; margin:10px 0 4px">체험수업 일정</label>
+      <input type="text" value="${b.schedule}" placeholder="예: 7월 15일(화) 오후 5시" onchange="setTrialBefore(${i},'schedule',this.value)">
+      <label style="font-size:12.5px; font-weight:700; color:var(--sub); display:block; margin:10px 0 4px">체험 수업 레벨</label>
+      <input type="text" value="${b.level}" placeholder="예: SKPT 3권" onchange="setTrialBefore(${i},'level',this.value)">
+      <label style="font-size:12.5px; font-weight:700; color:var(--sub); display:block; margin:10px 0 4px">특이사항</label>
+      <textarea rows="2" placeholder="체험 전 특이사항이 있다면 적어주세요." onchange="setTrialBefore(${i},'notes',this.value)">${b.notes}</textarea>
+      <div class="member-actions">
+        <button class="btn sm" onclick="copyTrialBefore(${i}, this)">체험 전 메시지 복사</button>
+      </div>
+
+      <div class="subhead">② 체험 수업 후</div>
+      <label class="step"><input type="checkbox" ${a.done?"checked":""} onchange="setTrialAfter(${i},'done',this.checked)">
+        <span class="t"><b>체험수업 완료</b><small>${a.doneAt? "✔ "+a.doneAt+" 자동 기록 (시간이 달랐다면 특이사항에 적어주세요)" : "체크하면 날짜·시간이 자동 기록돼요"}</small></span></label>
+      <label class="step"><input type="checkbox" ${a.feedbackDone?"checked":""} onchange="setTrialAfter(${i},'feedbackDone',this.checked)">
+        <span class="t"><b>학부모 피드백 통화 완료</b></span></label>
+      <label style="font-size:12.5px; font-weight:700; color:var(--sub); display:block; margin:10px 0 4px">적정 단계</label>
+      <input type="text" value="${a.finalLevel}" placeholder="예: SKPT 4권" onchange="setTrialAfter(${i},'finalLevel',this.value)">
+      <label style="font-size:12.5px; font-weight:700; color:var(--sub); display:block; margin:10px 0 4px">가입 상담 희망 시간</label>
+      <input type="text" value="${a.wantTime}" placeholder="예: 평일 오후 6시 이후" onchange="setTrialAfter(${i},'wantTime',this.value)">
+      <label style="font-size:12.5px; font-weight:700; color:var(--sub); display:block; margin:10px 0 4px">특이사항</label>
+      <textarea rows="2" placeholder="체험 후 특이사항이 있다면 적어주세요." onchange="setTrialAfter(${i},'notes',this.value)">${a.notes}</textarea>
+      <div class="member-actions">
+        <button class="btn sm" onclick="copyTrialAfter(${i}, this)">체험 후 메시지 복사</button>
+        <button class="btn sm ghost" onclick="delTrial(${i})">삭제</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+renderTrials();
+
 /* ---------- 안내메시지 카테고리 전환 ---------- */
 const msgCatOptsEl = document.getElementById("msgCatOpts");
 msgCatOptsEl.addEventListener("click", e=>{
@@ -893,7 +1010,6 @@ function buildMsgs(){
 /* ---------- 주간 피드백 문자 생성 ---------- */
 function tmplFeedback(f){
 const nameI = withI(f.child);
-const nameGa = nameI; // 은우+가, 하늘이+가
 return `안녕하세요, 어머님! 😊
 이번 주 ${nameI} 학습 현황 안내드립니다.
 
@@ -906,7 +1022,7 @@ return `안녕하세요, 어머님! 😊
 📝 선생님 코멘트
 ${f.comment}
 
-${nameGa}가 한 주 동안 열심히 잘 따라와줬어요! 다음 주도 함께 응원해주세요 💪
+다음 주도 흥미로운 수업 준비하겠습니다.
 궁금하신 점 있으시면 언제든 편하게 연락 주세요 😊`;
 }
 function buildFeedback(){
