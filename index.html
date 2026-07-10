@@ -852,7 +852,7 @@ let trials = store.get("trials", []);
 function saveTrials(){ store.set("trials", trials); renderTrials(); }
 function newTrial(name){
   return { name, date: new Date().toLocaleDateString("ko-KR"),
-    before: { callDone:false, katalkSent:false, schedule:"", level:"", notes:"" },
+    before: { katalkSent:false, schedule:"", level:"", notes:"" },
     after: { done:false, doneAt:"", feedbackDone:false, finalLevel:"", wantTime:"", notes:"" } };
 }
 function addTrial(){
@@ -883,10 +883,10 @@ function setTrialAfter(i, field, val){
 function tmplTrialBefore(t){
   const b = t.before;
   return `[체험수업 전 안내] ${t.name} 회원
-상담팀장님께서 주신 정보로 학부모님께 연락드렸습니다.
 
-${b.callDone ? "☑" : "☐"} 학부모님과 상담 전화 완료
-${b.katalkSent ? "☑" : "☐"} 카톡 안내 메시지 전달 완료
+팀장님께서 주신 정보로 학부모님께 연락드렸습니다.
+
+${b.katalkSent ? "☑" : "☐"} 학부모님께 체험 수업 안내 메시지 전달
 📅 체험수업 일정: ${b.schedule || "____"}
 📊 체험 수업 레벨: ${b.level || "____"}
 
@@ -915,10 +915,8 @@ function renderTrials(){
       <div class="member-head"><b>${t.name} 회원</b><span style="font-size:11.5px;color:var(--sub)">${t.date}</span></div>
 
       <div class="subhead">① 체험 수업 전</div>
-      <label class="step"><input type="checkbox" ${b.callDone?"checked":""} onchange="setTrialBefore(${i},'callDone',this.checked)">
-        <span class="t"><b>학부모님과 상담 전화 완료</b></span></label>
       <label class="step"><input type="checkbox" ${b.katalkSent?"checked":""} onchange="setTrialBefore(${i},'katalkSent',this.checked)">
-        <span class="t"><b>카톡 안내 메시지 전달 완료</b></span></label>
+        <span class="t"><b>학부모님께 체험 수업 안내 메시지 전달</b></span></label>
       <label style="font-size:12.5px; font-weight:700; color:var(--sub); display:block; margin:10px 0 4px">체험수업 일정</label>
       <input type="text" value="${b.schedule}" placeholder="예: 7월 15일(화) 오후 5시" onchange="setTrialBefore(${i},'schedule',this.value)">
       <label style="font-size:12.5px; font-weight:700; color:var(--sub); display:block; margin:10px 0 4px">체험 수업 레벨</label>
@@ -976,7 +974,8 @@ ${withI(t.child)}와의 체험수업 안내드립니다.
 체험수업 5분 전, 조용하고 편안한 공간에서 참여할 수 있도록 준비해주세요.
 
 체험수업은 약 15분 정도 진행되며, ${withI(t.child)} 학습 단계를 확인하고 윤선생 학습을 직접 체험해보는 시간이에요.
-궁금하신 점 있으시면 언제든 편하게 연락 주세요 😊
+확인하고 싶으신 사항이나 궁금하신 점 있으시면 언제든 편하게 연락 주세요 😊
+체험수업이 끝난 후 피드백 전화 드리겠습니다.
 그럼 체험수업 때 뵙겠습니다!`;
 }
 function buildTrial(){
