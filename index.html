@@ -269,7 +269,7 @@ footer{max-width:880px; margin:0 auto; padding:0 20px 36px; font-size:11.5px; co
   <div class="card msgForm" id="form-trial">
     <p class="desc" style="margin-bottom:10px">4개 항목을 채우면 체험수업 안내 문자가 완성됩니다.</p>
     <div class="grid2">
-      <div><label for="ftTeacher">담당 교사 이름</label><input type="text" id="ftTeacher" placeholder="예: 김샤넬"></div>
+      <div><label for="ftTeacher">담당 교사 이름</label><input type="text" id="ftTeacher" placeholder="예: 윤선생"></div>
       <div><label for="ftChild">아이 이름</label><input type="text" id="ftChild" placeholder="은우 (성은 빼고 입력해주세요)"></div>
       <div><label for="ftDate">체험수업 일시</label><input type="text" id="ftDate" placeholder="예: 5월 20일(화) 오후 5시"></div>
       <div><label for="ftZoom">줌 링크</label><input type="text" id="ftZoom" placeholder="https://zoom.us/j/..."></div>
@@ -285,7 +285,7 @@ footer{max-width:880px; margin:0 auto; padding:0 20px 36px; font-size:11.5px; co
   <div class="card msgForm" id="form-new" hidden>
     <p class="desc" style="margin-bottom:10px">6개 항목을 채우면 규정에 맞는 안내 문자 3가지가 완성됩니다. 복사해서 학부모 카톡으로 보내고, <b>확인 답변</b>을 꼭 받으세요.</p>
     <div class="grid2">
-      <div><label for="fTeacher">담당 교사 이름</label><input type="text" id="fTeacher" placeholder="예: 김샤넬"></div>
+      <div><label for="fTeacher">담당 교사 이름</label><input type="text" id="fTeacher" placeholder="예: 윤선생"></div>
       <div><label for="fChild">아이 이름</label><input type="text" id="fChild" placeholder="은우 (성은 빼고 입력해주세요)"></div>
       <div class="prodfield"><label>가입 상품</label>
         <div class="prodOpts" id="prodOpts">
@@ -405,6 +405,12 @@ footer{max-width:880px; margin:0 auto; padding:0 20px 36px; font-size:11.5px; co
   <p class="desc">수업 중 회원이 잘했을 때 바로 점수를 줄 수 있는 사이트예요. 칭찬 스티커 같은 역할이라 수업 참여 동기부여에 활용하기 좋아요.</p>
   <div class="card">
     <a class="btn" href="https://teach.classdojo.com/" target="_blank" rel="noopener">⭐ ClassDojo 바로가기</a>
+  </div>
+
+  <h2>스마트베플리 사용법 자료</h2>
+  <p class="desc">OT 진행 시 화면공유하며 스마트베플리 사용법을 설명하는 데 활용할 수 있는 자료예요.</p>
+  <div class="card">
+    <a class="btn" href="https://drive.google.com/file/d/1Ua7gnARR5759iR6OdFyBHgGKy6CJ85yH/view?usp=drive_link" target="_blank" rel="noopener">📱 스마트베플리 사용법 자료 열기</a>
   </div>
 
   <h2>베플학제 한눈에 (Level 1~8)</h2>
@@ -910,7 +916,6 @@ ${a.feedbackDone ? "☑" : "☐"} 학부모 피드백 통화 완료
 📊 적정 단계: ${a.finalLevel || "____"}
 🕐 가입 상담 희망 시간: ${a.wantTime || "____"}
 
-가입 관련 상담은 상담팀장님께서 연락드릴 예정이라고 안내드렸습니다.
 📝 특이사항: ${a.notes.trim() || "없음"}`;
 }
 function copyTrialBefore(i, btn){ copyText(tmplTrialBefore(trials[i]), btn); }
@@ -1030,7 +1035,6 @@ return `안녕하세요, 어머님! 😊
 📝 선생님 코멘트
 ${f.comment}
 
-다음 주도 흥미로운 수업 준비하겠습니다.
 궁금하신 점 있으시면 언제든 편하게 연락 주세요 😊`;
 }
 function buildFeedback(){
